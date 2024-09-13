@@ -35,24 +35,22 @@ class AppointmentsApplicationTests {
 		mySQLContainer.start();
 	}
 
-	// Тест на додавання послуги для перукаря
+	// Тест на додавання послуги
 	@Test
-	void shouldAddHairdresserService() {
-		String addHairdresserServiceJson = """
-        {
-            "hairdresserId": 1,
-            "serviceId": 2,
-            "servicePrice": 50.00,
-            "serviceDuration": 60
-        }
-        """;
+	void addService() {
+		String addServiceJson = """
+		{
+		   "id": 1,
+		   "service_name": "Haircut"
+		}
+		""";
 
 		// Відправляємо POST-запит і перевіряємо, що статус відповіді - 201 (створено)
 		var responseBodyString = RestAssured.given()
 				.contentType("application/json")
-				.body(addHairdresserServiceJson)
+				.body(addServiceJson)
 				.when()
-				.post("/api/hairdresserServices")
+				.post("/api/services")
 				.then()
 				.log().all()
 				.statusCode(201)
@@ -60,23 +58,23 @@ class AppointmentsApplicationTests {
 				.body().asString();
 
 		// Перевіряємо, що у відповіді отримали правильне повідомлення
-		assertThat(responseBodyString, Matchers.is("Hairdresser Service Placed Successfully"));
+		assertThat(responseBodyString, Matchers.is("Service Placed Successfully"));
 	}
 
-	// Тест на отримання всіх послуг для перукаря
+	// Тест на отримання всіх послуг
 	@Test
-	void shouldGetAllHairdresserServices() {
+	void shouldGetAllServices() {
 		var responseBodyString = RestAssured.given()
 				.contentType("application/json")
 				.when()
-				.get("/api/hairdresserServices")
+				.get("/api/services")
 				.then()
 				.log().all()
 				.statusCode(200)
 				.extract()
 				.body().asString();
 
-		// Перевіряємо, що відповідь містить певні дані (можна уточнити залежно від тестових даних)
-		assertThat(responseBodyString, Matchers.containsString("serviceId"));
+		// Перевіряємо, що відповідь містить "id" замість "serviceId"
+		assertThat(responseBodyString, Matchers.containsString("id"));
 	}
 }
