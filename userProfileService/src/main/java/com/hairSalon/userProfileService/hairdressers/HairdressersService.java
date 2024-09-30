@@ -11,6 +11,12 @@ import java.util.List;
 @Transactional
 public class HairdressersService {
     private final HairdressersRepository hairdressersRepository;
+    public boolean findHairdresserById(Long hairdresserId) {
+        Hairdressers hairdresser = hairdressersRepository.findById(hairdresserId)
+                .orElseThrow(() -> new IllegalArgumentException("Hairdressers not found"));
+        return hairdresser != null;
+    }
+
     // Отримання інформації про перукаря за ID
     public List<HairdressersRequest> findHairdressersByUserId(Long userId){
         List<Hairdressers> hairdressers = hairdressersRepository.findByUserId(userId);

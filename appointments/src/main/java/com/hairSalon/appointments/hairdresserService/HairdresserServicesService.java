@@ -1,5 +1,6 @@
 package com.hairSalon.appointments.hairdresserService;
 
+import com.hairSalon.appointments.hairdresserService.feign.UserProfileFeignClient;
 import com.hairSalon.appointments.services.Services;
 import com.hairSalon.appointments.services.ServicesRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,15 @@ import java.util.List;
 public class HairdresserServicesService {
     private final HairdresserServiceRepository hairdresserServiceRepository;
     private final ServicesRepository servicesRepository;
+    private final UserProfileFeignClient userProfileFeignClient;
     public void addHairdresserService(HairdresserServiceRequest request) {
+        // Перевірка, чи існує перукар
+        boolean result = userProfileFeignClient.getHairdresserById(request.hairdresserId());
+        if (!result) {
+            throw new RuntimeException("Hairdresser not found");
+        }
+
+        // Додавання послуги для існуючого перукаря
         HairdresserService service = mapToHairdresserService(request);
         hairdresserServiceRepository.save(service);
     }

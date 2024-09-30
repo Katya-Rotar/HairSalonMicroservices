@@ -17,6 +17,12 @@ public class HairdressersController {
     public List<HairdressersRequest> findHairdressersByUserId(@RequestParam Long userId){
         return hairdressersService.findHairdressersByUserId(userId);
     }
+
+    @GetMapping("/{id}")
+    public boolean getHairdresserById(@PathVariable("id") Long hairdresserId) {
+        return hairdressersService.findHairdresserById(hairdresserId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createHairdresserProfile(@RequestBody HairdressersRequest hairdressersRequest){
