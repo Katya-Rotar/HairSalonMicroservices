@@ -7,13 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.MySQLContainer;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@Import(TestcontainersConfiguration.class)
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(port = 0)
 class AppointmentsApplicationTests {
 	// Створюємо контейнер для MySQL
 	@ServiceConnection
@@ -76,5 +79,69 @@ class AppointmentsApplicationTests {
 
 		// Перевіряємо, що відповідь містить "id" замість "serviceId"
 		assertThat(responseBodyString, Matchers.containsString("id"));
+	}
+
+	@Test
+	void addHairdresserService_HairdresserExists() {
+		// Stub for checking if the hairdresser exists
+		stubFor(get(urlEqualTo("/api/hairdressers/1"))
+				.willReturn(aResponse()
+						.withStatus(200)
+						.withHeader("Content-Type", "application/json")
+						.withBody("true")));
+
+		// Create a service first
+		String serviceJson = """
+    {
+        "service_name": "Haircut"
+    }
+    """;
+
+		var createServiceResponse = RestAssured.given()
+				.contentType("application/json")
+				.body(serviceJson)
+				.when()
+				.post("/api/services") // Adjust this endpoint to match your service creation endpoint
+				.then()
+				.log().all() // Log the response
+				.statusCode(201) // Assume the service is created successfully
+				.extract()
+				.response();
+
+		// Now add the hairdresser service
+		String addServiceJson = """
+    {
+        "hairdresserId": 1,
+        "serviceId": 1,
+        "servicePrice": 50.0,
+        "serviceDuration": 30
+    }
+    """;
+
+		var response = RestAssured.given()
+				.contentType("application/json")
+				.body(addServiceJson)
+				.when()
+				.post("/api/hairdresserServices")
+				.then()
+				.log().all() // Log the response
+				.statusCode(201)
+				.extract()
+				.response();
+
+		// Ensure the response message is correct
+		assertThat(response.getStatusCode(), Matchers.is(201));
+		assertThat(response.getBody().asString(), Matchers.is("Hairdresser Service Added Successfully"));
+
+		// Optionally check that the service was created
+		var servicesResponse = RestAssured.given()
+				.when()
+				.get("/api/services")
+				.then()
+				.statusCode(200)
+				.extract()
+				.response();
+
+		assertThat(servicesResponse.getBody().asString(), Matchers.containsString("Haircut"));
 	}
 }
