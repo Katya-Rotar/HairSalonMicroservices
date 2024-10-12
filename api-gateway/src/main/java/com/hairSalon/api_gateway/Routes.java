@@ -14,36 +14,40 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> hairdresserServiceRoute() {
         return route("hairdresser_service")
-                .route(RequestPredicates.path("/api/hairdresserServices"), http(
-                        "http://localhost:8081"))
+                .route(RequestPredicates.path("/api/hairdresserServices")
+                        .or(RequestPredicates.path("/api/hairdresserServices/service/{serviceId}"))
+                        .or(RequestPredicates.path("/api/hairdresserServices/hairdresser/{hairdresserId}")), http(
+                        System.getenv("HAIRDRESSER_SERVICE_URL")))
                 .build();
     }
     @Bean
     public RouterFunction<ServerResponse> serviceRoute() {
         return route("service")
                 .route(RequestPredicates.path("/api/services"), http(
-                        "http://localhost:8081"))
+                        System.getenv("HAIRDRESSER_SERVICE_URL")))
                 .build();
     }
     @Bean
     public RouterFunction<ServerResponse> hairdresserLocationRoute() {
         return route("hairdresser_location")
-                .route(RequestPredicates.path("/api/hairdresserLocations"), http(
-                        "http://localhost:8082"))
+                .route(RequestPredicates.path("/api/hairdresserLocations")
+                        .or(RequestPredicates.path("/api/hairdresserLocations/{id}")), http(
+                        System.getenv("USER_PROFILE_SERVICE_URL")))
                 .build();
     }
     @Bean
     public RouterFunction<ServerResponse> hairdresserRoute() {
         return route("hairdresser")
-                .route(RequestPredicates.path("/api/hairdressers"), http(
-                        "http://localhost:8082"))
+                .route(RequestPredicates.path("/api/hairdressers")
+                        .or(RequestPredicates.path("/api/hairdressers/{id}")), http(
+                        System.getenv("USER_PROFILE_SERVICE_URL")))
                 .build();
     }
     @Bean
     public RouterFunction<ServerResponse> userProfileRoute() {
         return route("user_profile")
                 .route(RequestPredicates.path("/api/userProfile"), http(
-                        "http://localhost:8082"))
+                        System.getenv("USER_PROFILE_SERVICE_URL")))
                 .build();
     }
 }
