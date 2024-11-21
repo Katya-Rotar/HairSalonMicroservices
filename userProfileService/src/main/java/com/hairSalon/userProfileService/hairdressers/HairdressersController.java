@@ -37,7 +37,7 @@ public class HairdressersController {
     }
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteHairdresserProfile(@PathVariable Long id){
-        hairdressersService.deleteHairdresserProfile(id);
+    public void deleteHairdresser(@PathVariable Long id){
+        hairdressersService.deleteHairdresser(id);
     }
 }

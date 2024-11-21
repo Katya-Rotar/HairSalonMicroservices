@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "HairdresserDeletion",
+  "namespace": "com.hairSalon.avro",
+  "fields": [
+    {
+      "name": "hairdresserId",
+      "type": "long"
+    }
+  ]
+}

@@ -1,9 +1,10 @@
 package com.hairSalon.appointments.hairdresserService;
-
+import com.hairSalon.avro.HairdresserDeletion;
 import com.hairSalon.appointments.hairdresserService.feign.UserProfileFeignClient;
 import com.hairSalon.appointments.services.Services;
 import com.hairSalon.appointments.services.ServicesRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,4 +68,19 @@ public class HairdresserServicesService {
         hairdresserService.setServiceDuration(request.serviceDuration());
         return hairdresserService;
     }
+
+    @KafkaListener(topics = "hairdresser-deletion", groupId = "hairdresser-service-management")
+    public void consume(HairdresserDeletion hairdresserDeletion) {
+        Long hairdresserId = hairdresserDeletion.getHairdresserId();
+
+        // Логіка обробки видалення
+        System.out.println("Received Hairdresser Deletion Event for ID: " + hairdresserId);
+
+        // Видалити всі послуги, пов'язані з цим перукарем
+        List<HairdresserService> services = hairdresserServiceRepository.findByHairdresser(hairdresserId);
+        hairdresserServiceRepository.deleteAll(services);
+
+        System.out.println("Hairdresser services and associated records deleted for ID: " + hairdresserId);
+    }
 }
+
